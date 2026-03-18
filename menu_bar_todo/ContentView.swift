@@ -6,54 +6,44 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Binding var statusText: String
+    @State private var inputText: String = ""
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        VStack(spacing: 16) {
+            Text("Enter text to display in menu bar:")
+                .font(.headline)
+            
+            HStack {
+                TextField("Type here...", text: $inputText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(8)
+                    .onSubmit {
+                        updateStatusText()
                     }
+                
+                Button(action: updateStatusText) {
+                    Image(systemName: "checkmark")
+                        .padding(8)
                 }
-                .onDelete(perform: deleteItems)
+                .disabled(inputText.trimmingCharacters(in: .whitespaces).isEmpty)
             }
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-            .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            
+            if !statusText.isEmpty {
+                Text("Current menu bar text: \(statusText)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
         }
+        .padding(20)
+        .frame(width: 300)
     }
-}
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    private func updateStatusText() {
+        guard !inputText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        statusText = inputText.trimmingCharacters(in: .whitespaces)
+        inputText = ""
+    }
 }
