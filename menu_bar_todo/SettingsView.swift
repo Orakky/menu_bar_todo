@@ -47,7 +47,7 @@ struct SettingsView: View {
                     VStack(alignment: .center, spacing: 8) {
                         Button(action: {
                             // 检查更新的逻辑 - 打开GitHub链接
-                            if let url = URL(string: "https://github.com/Orakky/dustin") {
+                            if let url = URL(string: "https://github.com/Orakky/menu_bar_todo") {
                                 NSWorkspace.shared.open(url)
                             }
                         }) {
